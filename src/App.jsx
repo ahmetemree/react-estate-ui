@@ -4,12 +4,20 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import ListPage from "./routes/listPage/listPage";
-import Layout from "./routes/layout/layout";
 import SinglePage from "./routes/singlePage/singlePage";
 import ProfilePage from "./routes/profilePage/profilePage";
 import Login from "./routes/login/login";
 import Register from "./routes/register/register";
-
+import { createTheme, MantineProvider } from "@mantine/core";
+import '@mantine/core/styles.css';
+import '@mantine/notifications/styles.css';
+import { Notifications } from "@mantine/notifications";
+import { AuthContextProvider } from "./context/AuthContext";
+import {Layout, RequireAuth} from "./routes/layout/layout";
+import ProfileUpdatePage from "./routes/profileUpdatePage/profileUpdatePage";
+const theme = createTheme({
+  /** Your theme override here */
+});
 function App() {
   const router = createBrowserRouter([
     {
@@ -28,10 +36,7 @@ function App() {
           path:"/:id",
           element:<SinglePage/>
         },
-        {
-          path:"/profile",
-          element:<ProfilePage/>
-        },
+        
         {
           path:"/login",
           element:<Login/>
@@ -41,12 +46,32 @@ function App() {
           element:<Register/>
         }
       ]
-    }
+    },
+    {
+      path:"/",
+      element:<RequireAuth/>,
+      children:[
+        {
+          path:"/profile",
+          element:<ProfilePage/>,
+        },
+        {
+          path:"/profile/update",
+          element:<ProfileUpdatePage/>,
+        },
+      ],
+    },
   ]);
 
-  return (
+  
 
+  return (
+    <AuthContextProvider>
+    <MantineProvider theme={theme}>
+      <Notifications />
     <RouterProvider router={router}/>
+    </MantineProvider>
+    </AuthContextProvider>
   );
 }
 
